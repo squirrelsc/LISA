@@ -25,10 +25,6 @@ class Uname(Tool):
         return "uname"
 
     @property
-    def canInstall(self) -> bool:
-        return False
-
-    @property
     def isInstalledInternal(self) -> bool:
         return True
 

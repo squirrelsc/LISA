@@ -2,13 +2,13 @@ import logging
 import pathlib
 import shlex
 import time
-from timeit import default_timer as timer
 from typing import TYPE_CHECKING, Dict, Optional, Type
 
 import spur  # type: ignore
 
 from lisa.util.executableResult import ExecutableResult
 from lisa.util.logger import log
+from lisa.util.perf_timer import create_timer
 from lisa.util.shell import Shell
 
 if TYPE_CHECKING:
@@ -93,8 +93,7 @@ class Process:
         try:
             real_shell = self.shell.innerShell
             assert real_shell
-            self._start_timer = timer()
-            log.debug(f"cwd '{cwd_path}'")
+            self.timer = create_timer()
             self.process = real_shell.spawn(
                 command=split_command,
                 stdout=self.stdout_writer,
@@ -109,22 +108,18 @@ class Process:
         except (FileNotFoundError, spur.errors.NoSuchCommandError) as identifier:
             # FileNotFoundError: not found command on Windows
             # NoSuchCommandError: not found command on remote Linux
-            self._end_timer = timer()
-            self.process = ExecutableResult(
-                "", identifier.strerror, 1, self._end_timer - self._start_timer
-            )
+            self.elapsed = self.timer.elapsed
+            self.process = ExecutableResult("", identifier.strerror, 1, self.elapsed())
             log.debug(f"{self.cmd_prefix} not found command: {identifier}")
 
     def waitResult(self, timeout: float = 600) -> ExecutableResult:
         budget_time = timeout
+        timer = create_timer()
 
-        while self.isRunning() and budget_time >= 0:
-            start = timer()
+        while self.isRunning() and budget_time >= timer.elapsed(False):
             time.sleep(0.01)
-            end = timer()
-            budget_time = budget_time - (end - start)
 
-        if budget_time < 0:
+        if budget_time < timer.elapsed():
             if self.process is not None:
                 log.warn(f"{self.cmd_prefix}timeout in {timeout} sec, and killed")
             self.kill()
@@ -132,19 +127,18 @@ class Process:
         if not isinstance(self.process, ExecutableResult):
             assert self.process
             proces_result = self.process.wait_for_result()
-            self._end_timer = timer()
             self.stdout_writer.close()
             self.stderr_writer.close()
-            result = ExecutableResult(
+            result: ExecutableResult = ExecutableResult(
                 proces_result.output.strip(),
                 proces_result.stderr_output.strip(),
                 proces_result.return_code,
-                self._end_timer - self._start_timer,
+                self.timer.elapsed(),
             )
         else:
             result = self.process
 
-        log.debug(f"{self.cmd_prefix}executed with {result.elapsed:.3f} sec")
+        log.debug(f"{self.cmd_prefix}executed with {self.timer}")
         return result
 
     def kill(self) -> None:

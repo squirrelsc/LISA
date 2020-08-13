@@ -12,6 +12,7 @@ from lisa.util.connectionInfo import ConnectionInfo
 from lisa.util.exceptions import LisaException
 from lisa.util.executableResult import ExecutableResult
 from lisa.util.logger import log
+from lisa.util.perf_timer import create_timer
 from lisa.util.process import Process
 from lisa.util.shell import Shell
 
@@ -122,22 +123,23 @@ class Node:
         tool = self.tools.get(tool_key)
         if tool is None:
             # the Tool is not installed on current node, try to install it.
-            tool_prefix = f"tool '{tool_key}'"
+            tool_prefix = f"tool[{tool_key}]"
             log.debug(f"{tool_prefix} is initializing")
 
             if isinstance(tool_type, CustomScriptBuilder):
-                tool_key = tool_type.name
                 tool = tool_type.build(self)
             else:
-                tool_key = tool_type.__name__
                 cast_tool_type = cast(Type[Tool], tool_type)
                 tool = cast_tool_type(self)
+                tool.initialize()
 
             if not tool.isInstalled:
                 log.debug(f"{tool_prefix} is not installed")
                 if tool.canInstall:
                     log.debug(f"{tool_prefix} installing")
+                    timer = create_timer()
                     is_success = tool.install()
+                    log.debug(f"{tool_prefix} installed in {timer}")
                     if not is_success:
                         raise LisaException(f"{tool_prefix} install failed")
                 else:

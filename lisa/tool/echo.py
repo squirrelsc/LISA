@@ -10,9 +10,5 @@ class Echo(Tool):
         return command
 
     @property
-    def canInstall(self) -> bool:
-        return False
-
-    @property
     def isInstalledInternal(self) -> bool:
         return True
