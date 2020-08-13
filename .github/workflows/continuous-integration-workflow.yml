@@ -43,11 +43,15 @@ jobs:
       - name: Install Python dependencies
         run: poetry install
 
+      - name: Run LISAv3 hello-world
+        run: poetry run python lisa/main.py --debug
+
       - name: Run black/flake8/isort
         run: poetry run flake8
 
       - name: Run mypy static type checking
         run: poetry run mypy --strict --namespace-packages .
 
-      - name: Run LISAv3 hello-world
-        run: poetry run python lisa/main.py --debug
+      - name: Run ShellCheck
+        if: runner.os == 'Linux'
+        uses: ludeeus/action-shellcheck@0.5.0

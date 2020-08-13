@@ -16,7 +16,8 @@ class LISARunner(TestRunner):
         super().__init__()
         self.exitCode = None
 
-    def getTypeName(self) -> str:
+    @property
+    def typename(self) -> str:
         return "LISAv2"
 
     def config(self, key: str, value: object) -> None:
@@ -25,7 +26,7 @@ class LISARunner(TestRunner):
 
     async def start(self) -> None:
         await super().start()
-        self.setStatus(ActionStatus.RUNNING)
+        self.set_status(ActionStatus.RUNNING)
         test_factory = TestFactory()
         suites = test_factory.suites
 
@@ -41,10 +42,10 @@ class LISARunner(TestRunner):
                 test_suites[test_case_data.suite] = test_suite_cases
 
         environment_factory = EnvironmentFactory()
-        platform_type = self.platform.platformType()
+        platform_type = self.platform.platform_type()
         # request environment
         log.info(f"platform {platform_type} environment requesting")
-        environment = environment_factory.getEnvironment()
+        environment = environment_factory.get_environment()
         log.info(f"platform {platform_type} environment requested")
 
         log.info(f"start running {len(test_cases_results)} cases")
@@ -70,10 +71,10 @@ class LISARunner(TestRunner):
 
         # delete enviroment after run
         log.info(f"platform {platform_type} environment {environment.name} deleting")
-        self.platform.deleteEnvironment(environment)
+        self.platform.delete_environment(environment)
         log.info(f"platform {platform_type} environment {environment.name} deleted")
 
-        self.setStatus(ActionStatus.SUCCESS)
+        self.set_status(ActionStatus.SUCCESS)
 
     async def stop(self) -> None:
         super().stop()

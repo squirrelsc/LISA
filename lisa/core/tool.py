@@ -50,7 +50,7 @@ class Tool(ABC):
         """
         self.node: Node = node
         # triple states, None means not checked.
-        self._isInstalled: Optional[bool] = None
+        self._is_installed: Optional[bool] = None
 
     @property
     @abstractmethod
@@ -63,14 +63,14 @@ class Tool(ABC):
         raise NotImplementedError()
 
     @property
-    def canInstall(self) -> bool:
+    def can_install(self) -> bool:
         """
         Indicates if the tool supports installation or not. If it can return true,
         installInternal must be implemented.
         """
         raise NotImplementedError()
 
-    def installInternal(self) -> bool:
+    def _install_internal(self) -> bool:
         """
         Execute installation process like build, install from packages. If other tools
         are dependented, specify them in dependencies. Other tools can be used here,
@@ -102,24 +102,24 @@ class Tool(ABC):
         return self.__class__.__name__
 
     @property
-    def isInstalledInternal(self) -> bool:
+    def _is_installed_internal(self) -> bool:
         """
         Default implementation to check if a tool exists. This method is called by
         isInstalled, and cached result. Builtin tools can override it can return True
         directly to save time.
         """
-        if self.node.isLinux:
+        if self.node.is_linux:
             where_command = "command -v"
         else:
             where_command = "where"
         result = self.node.execute(
-            f"{where_command} {self.command}", shell=True, noInfoLog=True
+            f"{where_command} {self.command}", shell=True, no_info_log=True
         )
-        self._isInstalled = result.exitCode == 0
-        return self._isInstalled
+        self._is_installed = result.exit_code == 0
+        return self._is_installed
 
     @property
-    def isInstalled(self) -> bool:
+    def is_installed(self) -> bool:
         """
         Return if a tool installed. In most cases, overriding inInstalledInternal is
         enough. But if want to disable cached result and check tool every time,
@@ -127,9 +127,9 @@ class Tool(ABC):
         necessary.
         """
         # the check may need extra cost, so cache it's result.
-        if self._isInstalled is None:
-            self._isInstalled = self.isInstalledInternal
-        return self._isInstalled
+        if self._is_installed is None:
+            self._is_installed = self._is_installed_internal
+        return self._is_installed
 
     def install(self) -> bool:
         """
@@ -138,47 +138,47 @@ class Tool(ABC):
         """
         # check dependencies
         for dependency in self.dependencies:
-            self.node.getTool(dependency)
-        result = self.installInternal()
+            self.node.get_tool(dependency)
+        result = self._install_internal()
         return result
 
-    def runAsync(
+    def runasync(
         self,
-        extraParameters: str = "",
+        parameters: str = "",
         shell: bool = False,
-        noErrorLog: bool = False,
-        noInfoLog: bool = False,
+        no_error_log: bool = False,
+        no_info_log: bool = False,
         cwd: Optional[pathlib.PurePath] = None,
     ) -> Process:
         """
         Run a command async and return the Process. The process is used for async, or
         kill directly.
         """
-        if extraParameters:
-            command = f"{self.command} {extraParameters}"
+        if parameters:
+            command = f"{self.command} {parameters}"
         else:
             command = self.command
-        process = self.node.executeAsync(
-            command, shell, noErrorLog=noErrorLog, cwd=cwd, noInfoLog=noInfoLog,
+        process = self.node.executeasync(
+            command, shell, no_error_log=no_error_log, cwd=cwd, no_info_log=no_info_log,
         )
         return process
 
     def run(
         self,
-        extraParameters: str = "",
+        parameters: str = "",
         shell: bool = False,
-        noErrorLog: bool = False,
-        noInfoLog: bool = False,
+        no_error_log: bool = False,
+        no_info_log: bool = False,
         cwd: Optional[pathlib.PurePath] = None,
     ) -> ExecutableResult:
         """
         Run a process and wait for result.
         """
-        process = self.runAsync(
-            extraParameters=extraParameters,
+        process = self.runasync(
+            parameters=parameters,
             shell=shell,
-            noErrorLog=noErrorLog,
-            noInfoLog=noInfoLog,
+            no_error_log=no_error_log,
+            no_info_log=no_info_log,
             cwd=cwd,
         )
-        return process.waitResult()
+        return process.wait_result()
