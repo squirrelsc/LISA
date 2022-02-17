@@ -8,16 +8,14 @@ FIRMWARE_TYPE_UEFI = "uefi"
 
 
 # Configuration options for cloud-init ISO generation for the VM.
-@dataclass_json()
-@dataclass
+@dataschema
 class CloudInitSchema:
     # Additional values to apply to the cloud-init user-data file.
     extra_user_data: Optional[str] = None
 
 
 # QEMU orchestrator's global configuration options.
-@dataclass_json()
-@dataclass
+@dataschema
 class QemuPlatformSchema:
     # The timeout length for how long to wait for the OS to boot and request an IP
     # address from the libvirt DHCP server.
@@ -26,8 +24,7 @@ class QemuPlatformSchema:
 
 
 # QEMU orchestrator's per-node configuration options.
-@dataclass_json()
-@dataclass
+@dataschema
 class QemuNodeSchema:
     # The disk image to use for the node.
     # The file must use the qcow2 file format and should not be changed during test

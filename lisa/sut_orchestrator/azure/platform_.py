@@ -158,8 +158,7 @@ SAS_COPIED_CONTAINER_NAME = "lisa-sas-copied"
 _global_sas_vhd_copy_lock = Lock()
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class AzureCapability:
     location: str
     vm_size: str
@@ -172,8 +171,7 @@ class AzureCapability:
         _convert_to_azure_node_space(self.capability)
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class AzureLocation:
     updated_time: datetime = field(
         default_factory=datetime.now,
@@ -188,8 +186,7 @@ class AzureLocation:
     capabilities: List[AzureCapability] = field(default_factory=list)
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class AzureArmParameter:
     storage_name: str = ""
     location: str = ""
@@ -211,8 +208,7 @@ class AzureArmParameter:
         add_secret(self.admin_key_data)
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class AzurePlatformSchema:
     service_principal_tenant_id: str = field(
         default="",

@@ -5,17 +5,16 @@ from __future__ import annotations
 
 import copy
 from collections import UserDict
-from dataclasses import dataclass, field
+from dataclasses import field
 from enum import Enum
 from functools import partial
 from pathlib import Path
 from threading import Lock
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, cast
 
-from dataclasses_json import dataclass_json
 from marshmallow import validate
 
-from lisa import notifier, schema, search_space
+from lisa import dataschema, notifier, schema, search_space
 from lisa.node import Node, Nodes
 from lisa.notifier import MessageBase
 from lisa.tools import Uname
@@ -78,7 +77,7 @@ def _get_environment_id() -> int:
     return id
 
 
-@dataclass
+@dataschema
 class EnvironmentMessage(MessageBase):
     type: str = "Environment"
     name: str = ""
@@ -86,8 +85,7 @@ class EnvironmentMessage(MessageBase):
     status: EnvironmentStatus = EnvironmentStatus.New
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class EnvironmentSpace(search_space.RequirementMixin):
     """
     Search space of an environment. It uses to

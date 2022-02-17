@@ -13,8 +13,7 @@ from lisa.util import constants
 from .common import simplify_message
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class ConsoleSchema(schema.Notifier):
     file_name: str = "messages.log"
 

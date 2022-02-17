@@ -19,8 +19,7 @@ from lisa.testsuite import TestResultMessage, TestStatus
 from lisa.util import LisaException, constants
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class HtmlSchema(schema.Notifier):
     path: str = "lisa.html"
     """

@@ -2,23 +2,19 @@
 # Licensed under the MIT license.
 
 import copy
-from dataclasses import dataclass, field
+from dataclasses import field
 from enum import Enum
 from functools import partial
-from typing import Any, Dict, List, Optional, Type, TypeVar, Union, cast
+from typing import Any, Callable, Dict, List, Optional, Type, TypeVar, Union, cast
 
-from dataclasses_json import (
-    CatchAll,
-    DataClassJsonMixin,
-    Undefined,
-    config,
-    dataclass_json,
-)
+from dataclasses_json import CatchAll, DataClassJsonMixin, Undefined, config
 from marshmallow import ValidationError, fields, validate
 
 from lisa import search_space
 from lisa.secret import PATTERN_HEADTAIL, add_secret
 from lisa.util import BaseClassMixin, LisaException, constants, field_metadata
+
+from .common import dataschema
 
 """
 Schema is dealt with three components,
@@ -28,7 +24,6 @@ Schema is dealt with three components,
 3. marshmallow. Validator. It's wrapped by dataclasses_json. config(mm_field=xxx)
    function customizes this component.
 """
-
 
 T = TypeVar("T")
 
@@ -86,8 +81,7 @@ class ListableValidator(validate.Validator):
         return value
 
 
-@dataclass_json(undefined=Undefined.INCLUDE)
-@dataclass
+@dataschema(undefined=Undefined.INCLUDE)
 class ExtendableSchemaMixin:
     extended_schemas: CatchAll = field(default_factory=dict)  # type: ignore
 
@@ -151,14 +145,12 @@ class ExtendableSchemaMixin:
         return result
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class TypedSchema:
     type: str = field(default="", metadata=field_metadata(required=True))
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class Transformer(TypedSchema, ExtendableSchemaMixin):
     # the name can be referenced by other transformers. If it's not specified,
     # the type will be used.
@@ -193,16 +185,14 @@ class Transformer(TypedSchema, ExtendableSchemaMixin):
             self.prefix = self.name
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class Combinator(TypedSchema, ExtendableSchemaMixin):
     type: str = field(
         default=constants.COMBINATOR_GRID, metadata=field_metadata(required=True)
     )
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class Strategy:
     """
     node_path is the path of yaml node. For example:
@@ -231,8 +221,7 @@ class Strategy:
     )
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class Include:
     """
     Inclusion of runbook logic, for similar runs.
@@ -242,8 +231,7 @@ class Include:
     strategy: Union[List[Strategy], Strategy, None] = None
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class Extension:
     path: str
     name: Optional[str] = None
@@ -264,8 +252,7 @@ class Extension:
         return results
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class VariableEntry:
     value: Union[str, bool, int] = ""
     is_secret: bool = False
@@ -274,8 +261,7 @@ class VariableEntry:
     mask: str = ""
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class Variable:
     """
     it uses to support variables in other fields.
@@ -321,8 +307,7 @@ class Variable:
             self.value = self.value_raw
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class Notifier(TypedSchema, ExtendableSchemaMixin):
     """
     it sends test progress and results to any place wanted.
@@ -334,8 +319,7 @@ class Notifier(TypedSchema, ExtendableSchemaMixin):
     enabled: bool = True
 
 
-@dataclass_json()
-@dataclass()
+@dataschema
 class FeatureSettings(
     search_space.RequirementMixin, TypedSchema, ExtendableSchemaMixin
 ):
@@ -386,8 +370,7 @@ class DiskType(str, Enum):
     StandardSSDLRS = "StandardSSDLRS"
 
 
-@dataclass_json()
-@dataclass()
+@dataschema
 class DiskOptionSettings(FeatureSettings):
     type: str = constants.FEATURE_DISK
     disk_type: Optional[Union[search_space.SetSpace[DiskType], DiskType]] = field(
@@ -510,8 +493,7 @@ _network_data_path_priority: List[NetworkDataPath] = [
 ]
 
 
-@dataclass_json()
-@dataclass()
+@dataschema
 class NetworkInterfaceOptionSettings(FeatureSettings):
     type: str = "NetworkInterface"
     data_path: Optional[
@@ -609,8 +591,7 @@ class NetworkInterfaceOptionSettings(FeatureSettings):
         return min_value
 
 
-@dataclass_json()
-@dataclass()
+@dataschema
 class FeaturesSpace(
     search_space.SetSpace[Union[str, FeatureSettings]],
 ):
@@ -622,8 +603,7 @@ class FeaturesSpace(
                     self.items[index] = item
 
 
-@dataclass_json()
-@dataclass()
+@dataschema
 class NodeSpace(search_space.RequirementMixin, TypedSchema, ExtendableSchemaMixin):
     type: str = field(
         default=constants.ENVIRONMENTS_NODES_REQUIREMENT,
@@ -958,8 +938,7 @@ class NodeSpace(search_space.RequirementMixin, TypedSchema, ExtendableSchemaMixi
         return feature_setting
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class Capability(NodeSpace):
     type: str = constants.ENVIRONMENTS_NODES_REQUIREMENT
 
@@ -968,22 +947,19 @@ class Capability(NodeSpace):
         self.node_count = 1
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class Node(TypedSchema, ExtendableSchemaMixin):
     capability: Capability = field(default_factory=Capability)
     name: str = ""
     is_default: bool = field(default=False)
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class LocalNode(Node):
     type: str = constants.ENVIRONMENTS_NODES_LOCAL
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class RemoteNode(Node):
     type: str = constants.ENVIRONMENTS_NODES_REMOTE
     address: str = ""
@@ -1010,8 +986,7 @@ class RemoteNode(Node):
         add_secret(self.private_key_file)
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class Environment:
     name: str = field(default="")
     topology: str = field(
@@ -1047,15 +1022,13 @@ class Environment:
         self.nodes = results
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class EnvironmentRoot:
     warn_as_error: bool = field(default=False)
     environments: List[Environment] = field(default_factory=list)
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class Platform(TypedSchema, ExtendableSchemaMixin):
     type: str = field(
         default=constants.PLATFORM_READY,
@@ -1116,8 +1089,7 @@ class Platform(TypedSchema, ExtendableSchemaMixin):
             load_by_type(Capability, self.requirement)
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class Criteria:
     """
     all rules in same criteria are AND condition.
@@ -1141,8 +1113,7 @@ class Criteria:
     )
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class BaseTestCaseFilter(TypedSchema, ExtendableSchemaMixin, BaseClassMixin):
     """
     base test case filters for subclass factory
@@ -1155,8 +1126,7 @@ class BaseTestCaseFilter(TypedSchema, ExtendableSchemaMixin, BaseClassMixin):
     enabled: bool = field(default=True)
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class TestCase(BaseTestCaseFilter):
     type: str = field(
         default=constants.TESTCASE_TYPE_LISA,
@@ -1215,8 +1185,7 @@ class TestCase(BaseTestCaseFilter):
         return constants.TESTCASE_TYPE_LISA
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class LegacyTestCase(BaseTestCaseFilter):
     type: str = field(
         default=constants.TESTCASE_TYPE_LEGACY,
@@ -1235,8 +1204,7 @@ class LegacyTestCase(BaseTestCaseFilter):
         return constants.TESTCASE_TYPE_LEGACY
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class Runbook:
     # run name prefix to help grouping results and put it in title.
     name: str = "not_named"

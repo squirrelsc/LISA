@@ -12,8 +12,7 @@ from lisa.transformer import Transformer
 TO_LIST = "to_list"
 
 
-@dataclass_json
-@dataclass
+@dataschema
 class ToListTransformerSchema(schema.Transformer):
     # items to expand from string to list
     items: Dict[str, str] = field(default_factory=dict)

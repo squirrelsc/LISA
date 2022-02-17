@@ -11,8 +11,7 @@ from lisa.combinator import Combinator
 from lisa.util import constants, field_metadata
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class GridCombinatorSchema(schema.Combinator):
     items: List[schema.Variable] = field(
         default_factory=list, metadata=field_metadata(required=True)

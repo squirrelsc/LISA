@@ -20,8 +20,7 @@ CUSTOM_LOCAL = "custom_local"
 CUSTOM_REMOTE = "custom_remote"
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class CustomLocalNodeSchema(schema.LocalNode):
     type: str = field(
         default=CUSTOM_LOCAL,
@@ -64,8 +63,7 @@ class CustomLocalNode(node.LocalNode):
         return CustomLocalNodeSchema
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class CustomRemoteNodeSchema(schema.RemoteNode):
     type: str = field(
         default=CUSTOM_REMOTE,

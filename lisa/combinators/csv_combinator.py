@@ -11,16 +11,14 @@ from lisa import schema
 from lisa.combinator import Combinator
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class Entry:
     column: str
     variable: str
     default: Union[str, bool, int] = ""
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class CsvCombinatorSchema(schema.Combinator):
     file_name: str = ""
     # map csv column to variable name

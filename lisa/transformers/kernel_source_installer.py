@@ -17,20 +17,17 @@ from lisa.util.logger import Logger, get_logger
 from .kernel_installer import BaseInstaller, BaseInstallerSchema
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class BaseModifierSchema(schema.TypedSchema, schema.ExtendableSchemaMixin):
     ...
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class BaseLocationSchema(schema.TypedSchema, schema.ExtendableSchemaMixin):
     ...
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class LocalLocationSchema(BaseLocationSchema):
     path: str = field(
         default="",
@@ -40,8 +37,7 @@ class LocalLocationSchema(BaseLocationSchema):
     )
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class RepoLocationSchema(LocalLocationSchema):
     # source code repo
     repo: str = "https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git"
@@ -52,8 +48,7 @@ class RepoLocationSchema(LocalLocationSchema):
     cleanup_code: bool = False
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class PatchModifierSchema(BaseModifierSchema):
     repo: str = field(
         default="",
@@ -66,8 +61,7 @@ class PatchModifierSchema(BaseModifierSchema):
     file_pattern: str = "*.patch"
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class SourceInstallerSchema(BaseInstallerSchema):
     location: Optional[BaseLocationSchema] = field(
         default=None, metadata=field_metadata(required=True)

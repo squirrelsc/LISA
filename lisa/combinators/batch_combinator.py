@@ -11,8 +11,7 @@ from lisa.combinator import Combinator
 from lisa.util import constants, field_metadata
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class BatchCombinatorSchema(schema.Combinator):
     items: List[Dict[str, Any]] = field(
         default_factory=list, metadata=field_metadata(required=True)

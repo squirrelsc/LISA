@@ -10,16 +10,14 @@ from lisa import LisaException, schema
 from lisa.transformer import Transformer
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class ScriptEntry:
     name: str = ""
     variables: List[str] = field(default_factory=list)
     script: str = ""
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class ScriptTransformerSchema(schema.Transformer):
     scripts: List[ScriptEntry] = field(default_factory=list)
 

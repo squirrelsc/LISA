@@ -18,14 +18,12 @@ from lisa.util import field_metadata, filter_ansi_escape, get_matched_str, subcl
 from lisa.util.logger import Logger, get_logger
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class BaseInstallerSchema(schema.TypedSchema, schema.ExtendableSchemaMixin):
     ...
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class RepoInstallerSchema(BaseInstallerSchema):
     # the source of repo. It uses to specify a uncommon source in repo.
     # examples: linux-azure, linux-azure-edge, linux-image-azure-lts-20.04,
@@ -42,8 +40,7 @@ class RepoInstallerSchema(BaseInstallerSchema):
     is_proposed: bool = True
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class PpaInstallerSchema(RepoInstallerSchema):
     # The OpenPGP key of the PPA repo
     openpgp_key: str = ""
@@ -61,8 +58,7 @@ class PpaInstallerSchema(RepoInstallerSchema):
         add_secret(self.ppa_url, PATTERN_HEADTAIL)
 
 
-@dataclass_json
-@dataclass
+@dataschema
 class KernelInstallerTransformerSchema(schema.Transformer):
     # the SSH connection information to the node
     connection: Optional[schema.RemoteNode] = field(

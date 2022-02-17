@@ -2,10 +2,9 @@
 # Licensed under the MIT license.
 
 import time
-from dataclasses import dataclass, field
+from dataclasses import field
 from typing import Any, Dict, Optional
 
-from dataclasses_json import dataclass_json
 from marshmallow import validate
 
 from lisa import schema
@@ -21,8 +20,7 @@ def _mock_task() -> None:
     time.sleep(5)
 
 
-@dataclass_json()
-@dataclass
+@schema.dataschema
 class MockTestCase(BaseTestCaseFilter):
     type: str = field(
         default=TYPE_MOCK,

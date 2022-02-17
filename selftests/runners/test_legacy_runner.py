@@ -14,8 +14,7 @@ from lisa.util import LisaException
 from lisa.util.logger import get_logger
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class LegacyTestNotifier(schema.TypedSchema):
     ...
 

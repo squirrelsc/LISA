@@ -67,8 +67,7 @@ class RequirementMixin:
 T_SEARCH_SPACE = TypeVar("T_SEARCH_SPACE", bound=RequirementMixin)
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class IntRange(RequirementMixin):
     min: int = 0
     max: int = field(default=sys.maxsize)
@@ -207,8 +206,7 @@ def _one_of_matched(requirement: Any, capabilities: List[Any]) -> ResultReason:
     return result
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class SetSpace(RequirementMixin, Set[T]):
     is_allow_set: bool = False
     items: List[T] = field(default_factory=list)

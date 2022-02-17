@@ -31,8 +31,7 @@ class MockPlatformTestData:
     deleted_envs: List[str] = field(default_factory=list)
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class MockPlatformSchema:
     # for other UT to set value
     return_prepared: bool = True

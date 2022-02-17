@@ -423,8 +423,7 @@ _disk_size_iops_map: Dict[schema.DiskType, List[Tuple[int, int]]] = {
 }
 
 
-@dataclass_json()
-@dataclass()
+@dataschema
 class AzureDiskOptionSettings(schema.DiskOptionSettings):
     has_resource_disk: Optional[bool] = None
 

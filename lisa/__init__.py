@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+from lisa.common import dataschema
 from lisa.environment import Environment
 from lisa.executable import CustomScript, CustomScriptBuilder
 from lisa.node import Node, RemoteNode
@@ -48,6 +49,7 @@ __all__ = [
     "UnsupportedOperationException",
     "create_timer",
     "constants",
+    "dataschema",
     "node_requirement",
     "run_in_parallel",
     "simple_requirement",

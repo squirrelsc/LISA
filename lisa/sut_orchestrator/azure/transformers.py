@@ -56,8 +56,7 @@ def _generate_vhd_path(container_client: Any, file_name_part: str = "") -> str:
     return str(path)
 
 
-@dataclass_json
-@dataclass
+@dataschema
 class VhdTransformerSchema(schema.Transformer):
     # shared resource group name
     shared_resource_group_name: str = AZURE_SHARED_RG_NAME
@@ -83,15 +82,13 @@ class VhdTransformerSchema(schema.Transformer):
     restore: bool = False
 
 
-@dataclass_json
-@dataclass
+@dataschema
 class DeployTransformerSchema(schema.Transformer):
     requirement: schema.Capability = field(default_factory=schema.Capability)
     resource_group_name: str = ""
 
 
-@dataclass_json
-@dataclass
+@dataschema
 class DeleteTransformerSchema(schema.Transformer):
     resource_group_name: str = field(default="", metadata=field_metadata(required=True))
 

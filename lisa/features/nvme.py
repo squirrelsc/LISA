@@ -89,8 +89,7 @@ class Nvme(Feature):
             self._ls_devices = execute_results.stdout
 
 
-@dataclass_json()
-@dataclass()
+@dataschema
 class NvmeSettings(FeatureSettings):
     type: str = "Nvme"
     disk_count: search_space.CountSpace = field(

@@ -56,16 +56,14 @@ class NodeContext:
     private_key_file: str = ""
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class AzureVmPurchasePlanSchema:
     name: str
     product: str
     publisher: str
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class AzureVmMarketplaceSchema:
     publisher: str = "Canonical"
     offer: str = "UbuntuServer"
@@ -73,8 +71,7 @@ class AzureVmMarketplaceSchema:
     version: str = "Latest"
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class SharedImageGallerySchema:
     subscription_id: str = ""
     image_gallery: str = ""
@@ -82,8 +79,7 @@ class SharedImageGallerySchema:
     image_version: str = ""
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class AzureNodeSchema:
     name: str = ""
     vm_size: str = ""
@@ -546,8 +542,7 @@ class DataDiskCreateOption:
         ]
 
 
-@dataclass_json()
-@dataclass
+@dataschema
 class DataDiskSchema:
     caching_type: str = field(
         default=constants.DATADISK_CACHING_TYPE_NONE,

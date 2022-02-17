@@ -16,8 +16,7 @@ from lisa.variable import VariableEntry
 MOCK = "mock"
 
 
-@dataclass_json
-@dataclass
+@dataschema
 class TestTransformerSchema(schema.Transformer):
     items: Dict[str, str] = field(default_factory=dict)
 
