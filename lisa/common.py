@@ -16,13 +16,17 @@ def dataschema(
     def wrapper(cls: Any) -> Any:
         @wraps(cls)
         def inner(cls: Any) -> Any:
-            dataclass_json(
-                cls,
-                undefined=undefined,
+
+            dataclass(
+                dataclass_json(
+                    cls,
+                    undefined=undefined,
+                    *args,
+                    **kwargs,
+                ),
                 *args,
                 **kwargs,
             )
-            dataclass(cls, *args, **kwargs)
 
         return inner
 

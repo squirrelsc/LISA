@@ -18,10 +18,9 @@ from azure.mgmt.compute.models import (  # type: ignore
     NetworkInterfaceReference,
     VirtualMachineUpdate,
 )
-from dataclasses_json import dataclass_json
 from PIL import Image, UnidentifiedImageError
 
-from lisa import features, schema, search_space
+from lisa import dataschema, features, schema, search_space
 from lisa.features import NvmeSettings
 from lisa.features.gpu import ComputeSDK
 from lisa.features.resize import ResizeAction

@@ -5,7 +5,7 @@ import copy
 from dataclasses import field
 from enum import Enum
 from functools import partial
-from typing import Any, Callable, Dict, List, Optional, Type, TypeVar, Union, cast
+from typing import Any, Dict, List, Optional, Type, TypeVar, Union, cast
 
 from dataclasses_json import CatchAll, DataClassJsonMixin, Undefined, config
 from marshmallow import ValidationError, fields, validate

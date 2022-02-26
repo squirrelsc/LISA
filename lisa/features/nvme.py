@@ -2,12 +2,10 @@
 # Licensed under the MIT license.
 
 import re
-from dataclasses import dataclass, field
+from dataclasses import field
 from typing import Any, List, Type
 
-from dataclasses_json import dataclass_json
-
-from lisa import schema, search_space
+from lisa import dataschema, schema, search_space
 from lisa.feature import Feature
 from lisa.schema import FeatureSettings
 from lisa.tools import Lspci, Nvmecli
