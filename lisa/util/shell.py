@@ -7,6 +7,7 @@ import shutil
 import socket
 import sys
 import time
+from functools import partial
 from pathlib import Path, PurePath
 from time import sleep
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union, cast
@@ -142,6 +143,7 @@ def try_connect(connection_info: ConnectionInfo, ssh_timeout: int = 300) -> Any:
     # spur always run a posix command and will fail on Windows.
     # So try with paramiko firstly.
     paramiko_client = paramiko.SSHClient()
+    # paramiko.common.logging.basicConfig(level=paramiko.common.DEBUG)
 
     # Use base policy, do nothing on host key. The host key shouldn't be saved
     # locally, or make any warning message. The IP addresses in cloud may be
@@ -180,6 +182,36 @@ def try_connect(connection_info: ConnectionInfo, ssh_timeout: int = 300) -> Any:
     if not is_ready:
         raise LisaException(f"ssh connection cannot be established: {connection_info}")
 
+    # # the server may need extra key on connection, so send a key. The CentOS 6.x
+    # # needs it.
+    # transport = paramiko.Transport((connection_info.address, connection_info.port))
+    # if connection_info.private_key_file:
+    #     key: Any = paramiko.RSAKey.from_private_key_file(
+    #         connection_info.private_key_file
+    #     )
+    # else:
+    #     key = None
+    # transport.connect(
+    #     username=connection_info.username, pkey=key, password=connection_info.password
+    # )
+    # transport.auth_interactive_dumb(username=connection_info.username)
+    # try:
+    #     if connection_info.private_key_file:
+    #         transport.auth_publickey(connection_info.username, key)
+    #     else:
+    #         assert connection_info.password
+    #         transport.auth_password(connection_info.username, connection_info.password)
+    # except paramiko.AuthenticationException:
+    #     transport.auth_interactive_dumb(
+    #         connection_info.username, partial(handle_password, connection_info.password)
+    #     )
+    # channel = transport.open_session()
+    # transport = paramiko_client.get_transport()
+    # assert transport
+    # transport.auth_interactive(
+    #     connection_info.username, partial(handle_password, connection_info.password)
+    # )
+    # stdin, stdout, _ = channel.exec_command("cmd\n")
     stdin, stdout, _ = paramiko_client.exec_command("cmd\n")
     # Flush commands and prevent more writes
     stdin.flush()
@@ -208,6 +240,13 @@ def try_connect(connection_info: ConnectionInfo, ssh_timeout: int = 300) -> Any:
 @func_set_timeout(20)  # type: ignore
 def _spawn_ssh_process(shell: spur.ssh.SshShell, **kwargs: Any) -> spur.ssh.SshProcess:
     return shell.spawn(**kwargs)
+
+
+def handle_password(password: str, title: Any, instruction: Any, fields: Any):
+    if len(fields) == 1:
+        return [password]
+    else:
+        return []
 
 
 class SshShell(InitializableMixin):
